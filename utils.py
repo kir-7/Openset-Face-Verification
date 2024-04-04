@@ -8,11 +8,39 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 import numpy as np
 from collections import defaultdict
 import os
+import json
 
-from main import device
+
+def write_json(filepath, json_data):
+ 
+    # Load existing data from the JSON file, if it exists
+    try:
+        with open(filepath, 'r') as file:
+            existing_data = json.load(file)
+    except FileNotFoundError:
+        existing_data = {}
+
+    # Append the new data to the existing data
+    for key, value in json_data.items():
+        existing_data[key] = existing_data.get(key, []) + value
+
+    # Write the updated data back to the JSON file
+    with open(filepath, 'w') as file:
+        json.dump(existing_data, file, indent=4)
+
+    print('Data appended to JSON file successfully.')
 
 
-def create_copped_data(data_dir, dest_dir, workers, image_size=160, batch_size=32):
+def read_json(filepath):
+    try:
+        with open(filepath, 'r') as file:
+            data = json.load(file)
+            
+    except FileNotFoundError:
+        print(f"File '{filepath}' not found.")
+    return data
+
+def create_copped_data(data_dir, dest_dir, workers, image_size=160, batch_size=32, device='cpu'):
     
     mtcnn = MTCNN(image_size=image_size, 
                   margin=0, 
@@ -82,3 +110,5 @@ def create_dataloader(data_dir, batch_size, workers):
 
     return n_classes, train_loader, val_loader 
 
+def send_alert():
+    pass
